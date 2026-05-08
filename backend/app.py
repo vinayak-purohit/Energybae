@@ -107,11 +107,9 @@ def load_template_bytes():
     with open(TEMPLATE_PATH, "rb") as f:
         return f.read()
 
-
-# ════════════════════════════════════════════════════════
 #  HELPER: PDF → list of base64-encoded PNG images
 #  Groq Vision accepts images, not raw PDFs
-# ════════════════════════════════════════════════════════
+
 def pdf_to_base64_images(pdf_bytes):
     if not FITZ_AVAILABLE:
         raise RuntimeError("pymupdf not installed. Run: pip install pymupdf")
@@ -125,9 +123,8 @@ def pdf_to_base64_images(pdf_bytes):
     return images
 
 
-# ════════════════════════════════════════════════════════
 #  STEP 1: Extract bill data using Groq Vision AI
-# ════════════════════════════════════════════════════════
+
 def extract_bill_data(files):
     """
     Sends one or more electricity bill images/PDFs to Groq Vision
