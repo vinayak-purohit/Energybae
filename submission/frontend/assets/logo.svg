@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 60" width="400" height="60">
+  <!-- EB Icon -->
+  <rect x="2" y="4" width="52" height="52" rx="6" fill="none" stroke="#4CAF50" stroke-width="3"/>
+  <text x="14" y="42" font-family="Arial Black, sans-serif" font-size="36" font-weight="900" fill="#4CAF50">EB</text>
+  <!-- ENERGY text (green) -->
+  <text x="64" y="44" font-family="Arial Black, sans-serif" font-size="38" font-weight="900" fill="#4CAF50" letter-spacing="2">ENERGY</text>
+  <!-- BAE text (navy) -->
+  <text x="270" y="44" font-family="Arial Black, sans-serif" font-size="38" font-weight="900" fill="#1e3a8a" letter-spacing="2">BAE</text>
+</svg>
