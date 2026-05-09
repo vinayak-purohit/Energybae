@@ -46,7 +46,7 @@ except ImportError:
 #  CONFIG — All backend constants in one place
 
 GROQ_API_KEY    = os.environ.get("GROQ_API_KEY", "YOUR_GROQ_API_KEY_HERE")
-GROQ_MODEL      = "llama-3.2-11b-vision-preview"
+GROQ_MODEL      = "meta-llama/llama-4-scout-17b-16e-instruct"
 GROQ_BASE_URL   = "https://api.groq.com/openai/v1"
 
 # Path to the bundled Excel template (sits next to app.py)
