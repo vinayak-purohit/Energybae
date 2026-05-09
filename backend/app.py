@@ -280,7 +280,10 @@ def fill_excel_template(bill_data):
     # ── Consumer info ──
     ws["D1"] = bill_data.get("consumer_name", "")
     ws["D2"] = bill_data.get("consumer_number", "")
-    ws["D3"] = bill_data.get("fixed_charges", 130)
+    try:
+        ws["D3"] = float(bill_data.get("fixed_charges", 130) or 130)
+    except:
+        ws["D3"] = 130
     ws["D4"] = bill_data.get("sanctioned_load", "")
     ws["D5"] = bill_data.get("connection_type", "")
 
@@ -293,6 +296,14 @@ def fill_excel_template(bill_data):
     except Exception:
         pass
         
+    # Clear the old data from the right table (G, H, I, J) and left table
+    for r in range(9, 21):
+        for c in range(3, 11):
+            if c != 6: # keep column F (unit cost) if any
+                ws.cell(row=r, column=c).value = None
+        # Put a 0 in column H to prevent AVERAGE(H9:H21) from throwing #DIV/0!
+        ws.cell(row=r, column=8).value = 0
+                
     for i, entry in enumerate(monthly_data):
         row = 9 + i
         if row > 20:
@@ -301,10 +312,24 @@ def fill_excel_template(bill_data):
             ws.cell(row=row, column=3).value = datetime.strptime(entry["month"], "%Y-%m-%d")
         except Exception:
             ws.cell(row=row, column=3).value = entry.get("month", "")
-        ws.cell(row=row, column=4).value = entry.get("units", None)
+            
+        try:
+            u = float(entry.get("units", 0) or 0)
+        except:
+            u = 0
+        ws.cell(row=row, column=4).value = u
+        
         bill_amt = entry.get("bill_amount", None)
         if bill_amt is not None:
-            ws.cell(row=row, column=5).value = bill_amt
+            try:
+                b = float(bill_amt)
+            except:
+                b = 0
+            ws.cell(row=row, column=5).value = b
+
+    # Force Excel to recalculate formulas when opened
+    # openpyxl doesn't evaluate formulas, but we can ensure the workbook is set to auto-calculate.
+    # Note: openpyxl defaults to auto, but just to be sure we can leave it.
 
     # ── Return the filled workbook as bytes ──
     output = BytesIO()
