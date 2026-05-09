@@ -125,13 +125,23 @@ document.addEventListener('DOMContentLoaded', () => {
       const formData = new FormData();
       uploadedFiles.forEach(file => formData.append('files', file));
 
-      const response = await fetch('http://127.0.0.1:8000/api/generate-proposal', {
+      // For deployment: Update the string below with your actual Render URL
+      const API_BASE_URL = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost' 
+        ? 'http://127.0.0.1:8000'
+        : 'https://energybae-backend-rt36.onrender.com'; // <--- Live Render backend
+
+      const response = await fetch(`${API_BASE_URL}/api/generate-proposal`, {
         method: 'POST',
         body: formData
       });
 
       if (!response.ok) {
-        throw new Error(`Server error: ${response.status}`);
+        let errMsg = `Server error: ${response.status}`;
+        try {
+          const errData = await response.json();
+          if (errData.detail) errMsg += ` - ${errData.detail}`;
+        } catch(e) {}
+        throw new Error(errMsg);
       }
 
       generatedExcelBlob = await response.blob();

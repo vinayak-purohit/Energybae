@@ -43,11 +43,10 @@ except ImportError:
     FITZ_AVAILABLE = False
 
 
-# ════════════════════════════════════════════════════════
 #  CONFIG — All backend constants in one place
-# ════════════════════════════════════════════════════════
+
 GROQ_API_KEY    = os.environ.get("GROQ_API_KEY", "YOUR_GROQ_API_KEY_HERE")
-GROQ_MODEL      = "meta-llama/llama-4-scout-17b-16e-instruct"
+GROQ_MODEL      = "llama-3.2-11b-vision-preview"
 GROQ_BASE_URL   = "https://api.groq.com/openai/v1"
 
 # Path to the bundled Excel template (sits next to app.py)
@@ -90,9 +89,8 @@ app.mount("/assets", StaticFiles(directory=os.path.join(FRONTEND_DIR, "assets"))
 app.mount("/static", StaticFiles(directory=FRONTEND_DIR), name="static")
 
 
-# ════════════════════════════════════════════════════════
 #  HELPER: Load the bundled Excel template from disk
-# ════════════════════════════════════════════════════════
+
 def load_template_bytes():
     """
     Read the Excel template that ships with the app.
@@ -246,11 +244,10 @@ Ensure the JSON is wrapped in ```json ... ``` blocks.
         return obj
 
 
-# ════════════════════════════════════════════════════════
 #  STEP 2: Fill the bundled Excel template with extracted data
 #  Uses openpyxl so all existing formulas are preserved.
 #  Only writes to data-input cells — never touches formula cells.
-# ════════════════════════════════════════════════════════
+
 def fill_excel_template(bill_data):
     """
     Loads the bundled template from disk, fills it with
@@ -337,13 +334,19 @@ async def generate_proposal(files: List[UploadFile] = File(...)):
         # 2. Fill Excel
         filled_excel_bytesio = fill_excel_template(extracted_data)
         
-        customer_name = extracted_data.get("consumer_name", "Customer").replace(" ", "_")
+        import re
+        customer_name = str(extracted_data.get("consumer_name", "Customer"))
+        customer_name = re.sub(r'[\\/*?:"<>|\n\r]', "", customer_name)
+        customer_name = customer_name.strip().replace(" ", "_")
+        if not customer_name:
+            customer_name = "Customer"
+            
         file_name = f"Energybae_Solar_Proposal_{customer_name}.xlsx"
         
         # Return the Excel file
         headers = {
             'Content-Disposition': f'attachment; filename="{file_name}"',
-            'X-Extracted-Data': json.dumps(extracted_data) # Send extracted data back in header if frontend wants to show it
+            'X-Extracted-Data': json.dumps(extracted_data).replace('\n', ' ').replace('\r', '') # Send extracted data back in header if frontend wants to show it
         }
         
         return Response(
@@ -352,6 +355,8 @@ async def generate_proposal(files: List[UploadFile] = File(...)):
             headers=headers
         )
     except Exception as e:
+        import traceback
+        traceback.print_exc()  # This will print the actual error to your Render logs!
         raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":

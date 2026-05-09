@@ -75,7 +75,7 @@ Ensure the JSON is wrapped in ```json ... ``` blocks.
 """
 
 response = client.chat.completions.create(
-    model="meta-llama/llama-4-scout-17b-16e-instruct",
+    model="llama-3.2-11b-vision-preview",
     messages=[{
         "role": "user",
         "content": image_parts + [{"type": "text", "text": prompt}]
