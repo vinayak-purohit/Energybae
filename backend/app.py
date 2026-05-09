@@ -329,7 +329,9 @@ def fill_excel_template(bill_data):
 
     # Force Excel to recalculate formulas when opened
     # openpyxl doesn't evaluate formulas, but we can ensure the workbook is set to auto-calculate.
-    # Note: openpyxl defaults to auto, but just to be sure we can leave it.
+    wb.calculation.calcMode = 'auto'
+    wb.calculation.fullCalcOnLoad = True
+    wb.calculation.forceFullCalc = True
 
     # ── Return the filled workbook as bytes ──
     output = BytesIO()
